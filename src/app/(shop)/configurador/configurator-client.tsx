@@ -5,6 +5,7 @@ import { UseCaseSelector } from '@/components/configurator/use-case-selector'
 import { SlotPicker } from '@/components/configurator/slot-picker'
 import { BuildSummary } from '@/components/configurator/build-summary'
 import { BuildPresets } from '@/components/configurator/build-presets'
+import { PerformanceEstimator } from '@/components/configurator/performance-estimator'
 import type { Product, SlotKey } from '@/types'
 import { useEffect, useState } from 'react'
 
@@ -49,6 +50,7 @@ export function ConfiguratorClient({ components, slots }: ConfiguratorClientProp
       <div className="grid lg:grid-cols-[1fr_360px] gap-8 lg:gap-12">
         <div className="min-w-0">
           <SlotPicker components={components} slots={slots} />
+          <PerformanceEstimator />
         </div>
         <BuildSummary />
       </div>
