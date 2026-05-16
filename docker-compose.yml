@@ -1,0 +1,42 @@
+# ============================================================
+# JB Tecnología MED — Stack de desarrollo local
+# ============================================================
+# Este compose levanta el motor Postgres que usa el proyecto. El resto del
+# stack Supabase (Auth, Storage, Studio, REST, etc.) se inicia con la CLI
+# oficial (`supabase start`), que ya lee `supabase/config.toml` y orquesta
+# todos los contenedores con la misma red. La forma recomendada de trabajar
+# es usar la CLI — este archivo existe como alternativa minimalista para
+# quienes solo necesitan la base de datos (por ejemplo, para correr tests
+# o inspeccionar el schema).
+#
+# Para levantar TODO el stack (auth, storage, studio, etc.) usá:
+#   supabase start
+#
+# Para levantar solo Postgres con este compose:
+#   docker compose up -d
+# ============================================================
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: jbtec_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "54422:5432"
+    volumes:
+      - jbtec_pgdata:/var/lib/postgresql/data
+      - ./supabase/migrations:/docker-entrypoint-initdb.d/migrations:ro
+      - ./supabase/seed.sql:/docker-entrypoint-initdb.d/zz_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  jbtec_pgdata:
+    name: jbtec_pgdata

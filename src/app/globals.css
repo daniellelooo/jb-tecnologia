@@ -1,0 +1,206 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   JB Tecnología Design System — Pure Monochrome
+   Brand palette: black, white, neutral grays. No color accents.
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* Surfaces — pure black with neutral elevations */
+    --background: 0 0% 4%;            /* near-black #0A0A0A */
+    --foreground: 0 0% 98%;            /* near-white */
+    --surface: 0 0% 8%;                /* elevated surface */
+    --surface-alt: 0 0% 12%;           /* alt elevated surface */
+
+    /* Cards */
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 98%;
+
+    /* Popover */
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Primary = white in dark mode */
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 4%;
+
+    /* Secondary = dark surface */
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 98%;
+
+    /* Muted */
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 62%;
+
+    /* Accent */
+    --accent: 0 0% 14%;
+    --accent-foreground: 0 0% 98%;
+
+    /* Destructive */
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Hairlines */
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 0 0% 84%;
+
+    --radius: 0.75rem;
+
+    /* JB Tecnología custom tokens — remapped for dark canvas */
+    --mpc-black: 0 0% 98%;             /* "brand foreground" — now near-white */
+    --mpc-near-black: 0 0% 12%;        /* slightly elevated surface */
+    --mpc-charcoal: 0 0% 22%;          /* lifted surface */
+    --mpc-graphite: 0 0% 62%;          /* body secondary text */
+    --mpc-silver: 0 0% 38%;            /* dim accent text */
+    --mpc-mist: 0 0% 16%;              /* hairline-darker surface */
+    --mpc-fog: 0 0% 9%;                /* base elevated surface */
+  }
+
+  .dark {
+    /* Dark mode mirrors the brand night theme — used in admin sidebar / hero */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+    --surface: 0 0% 6%;
+    --surface-alt: 0 0% 10%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 62%;
+    --accent: 0 0% 14%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 0 0% 84%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'ss01', 'cv01', 'cv02', 'cv11';
+    background-color: hsl(0 0% 3%);
+    background-image:
+      /* Dot grid base */
+      radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+      /* Ambient glows from above + sides */
+      radial-gradient(ellipse 90% 60% at 50% -20%, rgba(255, 255, 255, 0.14), transparent 65%),
+      radial-gradient(ellipse 70% 50% at 100% 0%, rgba(255, 255, 255, 0.07), transparent 70%),
+      radial-gradient(ellipse 50% 40% at 0% 30%, rgba(255, 255, 255, 0.05), transparent 70%);
+    background-size: 28px 28px, 100% 100%, 100% 100%, 100% 100%;
+    background-attachment: fixed;
+    background-position: 0 0, 0 0, 0 0, 0 0;
+  }
+  /* Vignette around viewport edges — makes the page feel "framed" */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(ellipse 100% 70% at center, transparent 35%, rgba(0, 0, 0, 0.6) 95%);
+  }
+  /* Film grain overlay — adds tactile texture */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  /* Ensure content sits above the bg overlays */
+  body > * { position: relative; z-index: 1; }
+  ::selection {
+    @apply bg-foreground text-background;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+
+  /* Hide scrollbar */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Hairline borders */
+  .hairline { box-shadow: inset 0 0 0 1px hsl(0 0% 18%); }
+  .hairline-dark { box-shadow: inset 0 0 0 1px hsl(0 0% 22%); }
+
+  /* Double-bezel ring (premium nested card outline) */
+  .ring-bezel { box-shadow: 0 0 0 1px hsl(0 0% 18%), inset 0 1px 0 rgb(255 255 255 / 0.05); }
+  .ring-bezel-dark { box-shadow: 0 0 0 1px hsl(0 0% 28%), inset 0 1px 0 rgb(255 255 255 / 0.08); }
+
+  /* Soft elevated shadow */
+  .shadow-soft { box-shadow: 0 1px 2px rgba(0,0,0,0.6), 0 8px 32px -8px rgba(0,0,0,0.5); }
+  .shadow-soft-lg { box-shadow: 0 2px 4px rgba(0,0,0,0.6), 0 24px 64px -16px rgba(0,0,0,0.6); }
+  .shadow-soft-dark { box-shadow: 0 1px 2px rgba(0,0,0,0.6), 0 24px 64px -16px rgba(0,0,0,0.7); }
+
+  /* Subtle grain overlay (apply as fixed pseudo) */
+  .grain::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 60;
+    opacity: 0.03;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Magnetic press */
+  .press { transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1); }
+  .press:active { transform: scale(0.97); }
+
+  /* Custom premium easing */
+  .ease-premium { transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1); }
+
+  /* Spotlight glow used behind hero headlines */
+  .bg-spotlight {
+    background-image: radial-gradient(ellipse 60% 50% at 30% 30%, rgba(255, 255, 255, 0.06), transparent 70%);
+  }
+
+  /* Dot-grid utility for sections that need extra tech texture */
+  .bg-dot-grid {
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Diagonal lines pattern */
+  .bg-stripes {
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.02),
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 1px,
+      transparent 10px
+    );
+  }
+}
+
+/* Premium typography helpers */
+@layer base {
+  h1, h2, h3, h4 { letter-spacing: -0.02em; }
+  .display { letter-spacing: -0.04em; font-feature-settings: 'ss01'; }
+}
