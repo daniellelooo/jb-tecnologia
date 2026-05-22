@@ -10,7 +10,8 @@ import type { Product, BuildSlots, CpuSpecs, GpuSpecs, RamSpecs } from '@/types'
 type Res = '1080p' | '1440p' | '4k'
 type GpuKey =
   | 'gtx_1650' | 'rx_7600' | 'rtx_3060' | 'rtx_4060'
-  | 'rx_6700_xt' | 'rtx_3070_ti' | 'rtx_4070'
+  | 'rx_6700_xt' | 'rtx_3070_ti' | 'rtx_4060_ti' | 'rtx_4070'
+  | 'rx_7700_xt' | 'rtx_4070_super' | 'rx_7800_xt' | 'rtx_4070_ti' | 'rtx_4080'
 
 interface GameFps { '1080p': number; '1440p': number; '4k': number }
 
@@ -25,7 +26,9 @@ export interface GameEntry {
 
 // Tier ascendente — usado para fallback por interpolación
 const GPU_TIER: GpuKey[] = [
-  'gtx_1650', 'rx_7600', 'rtx_3060', 'rtx_4060', 'rx_6700_xt', 'rtx_3070_ti', 'rtx_4070',
+  'gtx_1650', 'rx_7600', 'rtx_3060', 'rtx_4060', 'rx_6700_xt',
+  'rtx_3070_ti', 'rtx_4060_ti', 'rtx_4070', 'rx_7700_xt',
+  'rtx_4070_super', 'rx_7800_xt', 'rtx_4070_ti', 'rtx_4080',
 ]
 
 const GPU_RELATIVE: Record<GpuKey, number> = {
@@ -35,7 +38,13 @@ const GPU_RELATIVE: Record<GpuKey, number> = {
   rtx_4060: 80,
   rx_6700_xt: 85,
   rtx_3070_ti: 105,
+  rtx_4060_ti: 95,
   rtx_4070: 120,
+  rx_7700_xt: 125,
+  rtx_4070_super: 138,
+  rx_7800_xt: 145,
+  rtx_4070_ti: 150,
+  rtx_4080: 175,
 }
 
 // ============================================================
@@ -151,6 +160,42 @@ export const GAMES: GameEntry[] = [
       rtx_4070: { '1080p': 160, '1440p': 125, '4k': 70 },
     },
   },
+  {
+    id: 'marvel_rivals', name: 'Marvel Rivals', cpuHeavy: true,
+    fpsByGpu: {
+      gtx_1650: { '1080p': 40, '1440p': 26, '4k': 12 },
+      rtx_3060: { '1080p': 95, '1440p': 65, '4k': 30 },
+      rtx_4060: { '1080p': 115, '1440p': 80, '4k': 38 },
+      rtx_4070: { '1080p': 145, '1440p': 105, '4k': 55 },
+    },
+  },
+  {
+    id: 'helldivers2', name: 'Helldivers 2', cpuHeavy: true,
+    fpsByGpu: {
+      gtx_1650: { '1080p': 32, '1440p': 22, '4k': 10 },
+      rtx_3060: { '1080p': 78, '1440p': 56, '4k': 28 },
+      rtx_4060: { '1080p': 88, '1440p': 64, '4k': 32 },
+      rtx_4070: { '1080p': 120, '1440p': 90, '4k': 48 },
+    },
+  },
+  {
+    id: 'bg3', name: "Baldur's Gate 3", cpuHeavy: false,
+    fpsByGpu: {
+      gtx_1650: { '1080p': 28, '1440p': 19, '4k': 9 },
+      rtx_3060: { '1080p': 72, '1440p': 52, '4k': 26 },
+      rtx_4060: { '1080p': 85, '1440p': 60, '4k': 30 },
+      rtx_4070: { '1080p': 115, '1440p': 86, '4k': 46 },
+    },
+  },
+  {
+    id: 'fc25', name: 'EA Sports FC 25', cpuHeavy: false,
+    fpsByGpu: {
+      gtx_1650: { '1080p': 70, '1440p': 50, '4k': 24 },
+      rtx_3060: { '1080p': 145, '1440p': 110, '4k': 58 },
+      rtx_4060: { '1080p': 160, '1440p': 125, '4k': 65 },
+      rtx_4070: { '1080p': 200, '1440p': 160, '4k': 88 },
+    },
+  },
 ]
 
 // ============================================================
@@ -178,13 +223,20 @@ function matchCpuKey(name: string): keyof typeof CPU_SCORES | null {
 
 function matchGpuKey(name: string): GpuKey | null {
   const n = name.toLowerCase().replace(/\s+/g, '')
-  if (n.includes('gtx1650') || n.includes('gtx-1650')) return 'gtx_1650'
-  if (n.includes('rx7600') || n.includes('radeonrx7600')) return 'rx_7600'
-  if (n.includes('rtx3060') && !n.includes('ti')) return 'rtx_3060'
-  if (n.includes('rtx4060') && !n.includes('ti')) return 'rtx_4060'
-  if (n.includes('rx6700xt') || n.includes('6700xt')) return 'rx_6700_xt'
+  // Más específicas primero
+  if (n.includes('rtx4080')) return 'rtx_4080'
+  if (n.includes('rtx4070ti') || n.includes('4070ti')) return 'rtx_4070_ti'
+  if (n.includes('rtx4070super') || n.includes('4070super')) return 'rtx_4070_super'
+  if (n.includes('rtx4060ti') || n.includes('4060ti')) return 'rtx_4060_ti'
   if (n.includes('rtx3070ti') || n.includes('3070ti')) return 'rtx_3070_ti'
+  if (n.includes('rx7800xt') || n.includes('7800xt')) return 'rx_7800_xt'
+  if (n.includes('rx7700xt') || n.includes('7700xt')) return 'rx_7700_xt'
+  if (n.includes('rx6700xt') || n.includes('6700xt')) return 'rx_6700_xt'
   if (n.includes('rtx4070') && !n.includes('ti') && !n.includes('super')) return 'rtx_4070'
+  if (n.includes('rtx4060') && !n.includes('ti')) return 'rtx_4060'
+  if (n.includes('rtx3060') && !n.includes('ti')) return 'rtx_3060'
+  if (n.includes('rx7600') || n.includes('radeonrx7600')) return 'rx_7600'
+  if (n.includes('gtx1650') || n.includes('gtx-1650')) return 'gtx_1650'
   return null
 }
 

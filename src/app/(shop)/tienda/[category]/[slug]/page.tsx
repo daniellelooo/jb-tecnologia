@@ -85,6 +85,7 @@ export default async function ProductPage({ params }: PageProps) {
                   priority
                   sizes="(max-width: 1024px) 100vw, 600px"
                   className="object-contain p-10"
+                  unoptimized={heroUrl.includes('wikimedia.org')}
                 />
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-mpc-fog via-mpc-mist to-mpc-fog">
@@ -173,7 +174,7 @@ export default async function ProductPage({ params }: PageProps) {
           {/* Trust strip */}
           <div className="grid grid-cols-3 gap-2 pt-4">
             {[
-              { icon: ShieldCheck, label: 'Garantía MPC' },
+              { icon: ShieldCheck, label: 'Garantía JB Tecnología' },
               { icon: Truck, label: 'Domicilio Medellín' },
               { icon: Wrench, label: 'Soporte técnico' },
             ].map((t) => {

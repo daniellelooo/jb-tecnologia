@@ -11,6 +11,7 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const next = searchParams.get('next') ?? '/admin'
+  const errorParam = searchParams.get('error')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -40,6 +41,11 @@ function LoginForm() {
         <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40 mb-3">Panel administrativo</div>
         <h1 className="text-4xl font-bold tracking-display text-white">Acceso restringido</h1>
         <p className="text-sm text-white/40 mt-3">Solo personal autorizado de JB Tecnología MED.</p>
+        {errorParam === 'no-permission' && (
+          <div className="mt-5 rounded-2xl bg-red-500/10 border border-red-500/30 px-4 py-2.5 text-xs text-red-300">
+            Tu cuenta no tiene permisos de administrador. Para clientes, usa <a href="/cuenta" className="underline font-medium">/cuenta</a>.
+          </div>
+        )}
       </div>
 
       <div className="space-y-3">

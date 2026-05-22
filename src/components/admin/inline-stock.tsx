@@ -33,7 +33,7 @@ export function InlineStock({ productId, currentStock }: { productId: string; cu
     return (
       <button
         onClick={() => setEditing(true)}
-        className="text-sm font-bold tabular-nums hover:bg-neutral-800 rounded-md px-2 py-0.5 transition-colors duration-300 ease-premium"
+        className="text-sm font-bold tabular-nums text-neutral-900 hover:bg-neutral-100 rounded-md px-2 py-0.5 transition-colors duration-200 ease-premium"
       >
         {currentStock}
       </button>
@@ -49,12 +49,12 @@ export function InlineStock({ productId, currentStock }: { productId: string; cu
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && handleSave()}
         autoFocus
-        className="h-7 w-16 rounded-md border border-neutral-700 px-2 text-sm tabular-nums focus:outline-none focus:border-white"
+        className="h-7 w-16 rounded-md border border-neutral-300 bg-white px-2 text-sm tabular-nums text-neutral-900 focus:outline-none focus:border-neutral-900"
       />
-      <button onClick={handleSave} disabled={pending} className="h-6 w-6 rounded-md hover:bg-neutral-800 grid place-items-center">
+      <button onClick={handleSave} disabled={pending} className="h-6 w-6 rounded-md text-emerald-700 hover:bg-emerald-50 grid place-items-center">
         {pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" strokeWidth={1.8} />}
       </button>
-      <button onClick={() => { setEditing(false); setValue(currentStock.toString()) }} className="h-6 w-6 rounded-md hover:bg-neutral-800 grid place-items-center">
+      <button onClick={() => { setEditing(false); setValue(currentStock.toString()) }} className="h-6 w-6 rounded-md text-neutral-500 hover:bg-neutral-100 grid place-items-center">
         <X className="h-3 w-3" strokeWidth={1.8} />
       </button>
     </div>

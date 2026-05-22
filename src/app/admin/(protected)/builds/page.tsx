@@ -42,8 +42,8 @@ export default async function AdminBuildsPage() {
     <div className="space-y-6">
       <header>
         <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-400 mb-2">Configurador</div>
-        <h1 className="text-3xl md:text-4xl font-bold tracking-display">Builds</h1>
-        <p className="text-sm text-neutral-500 mt-2">Configuraciones de PC armadas por los clientes en el configurador.</p>
+        <h1 className="text-3xl md:text-4xl font-bold tracking-display text-neutral-900">Builds</h1>
+        <p className="text-sm text-neutral-600 mt-2">Configuraciones de PC armadas por los clientes en el configurador.</p>
       </header>
 
       {builds.length === 0 ? (

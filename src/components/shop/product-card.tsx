@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { Product, ProductImage } from '@/types'
 import { PriceDisplay } from './price-display'
+import { Spotlight } from './spotlight'
 import { getPrimaryImage, wixCdnUrl } from '@/lib/product-image'
 
 interface ProductCardProps {
@@ -22,9 +23,9 @@ export function ProductCard({ product, categorySlug = 'tienda' }: ProductCardPro
       href={href}
       className="group relative block focus:outline-none"
     >
-      {/* Double-bezel outer shell */}
-      <div className="rounded-[1.75rem] p-1.5 bg-white/[0.04] hover:bg-white/[0.08] transition-colors duration-500 ease-premium">
-        <article className="rounded-[1.4rem] bg-neutral-900 overflow-hidden ring-1 ring-white/[0.08]">
+      {/* Double-bezel outer shell with cursor spotlight */}
+      <Spotlight className="rounded-[1.75rem] p-1.5 bg-white/[0.04] hover:bg-white/[0.08] transition-colors duration-500 ease-premium">
+        <article className="rounded-[1.4rem] bg-neutral-900 overflow-hidden ring-1 ring-white/[0.08] relative z-10">
           {/* Image */}
           <div className="relative aspect-square bg-mpc-fog overflow-hidden">
             {primaryImage ? (
@@ -34,6 +35,7 @@ export function ProductCard({ product, categorySlug = 'tienda' }: ProductCardPro
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
                 className="object-contain p-6 transition-transform duration-700 ease-premium group-hover:scale-[1.04]"
+                unoptimized={primaryImage.includes('wikimedia.org')}
               />
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-mpc-fog via-mpc-mist to-mpc-fog">
@@ -47,12 +49,12 @@ export function ProductCard({ product, categorySlug = 'tienda' }: ProductCardPro
             {/* Top-left badges */}
             <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
               {isNew && (
-                <span className="text-[9px] font-bold uppercase tracking-[0.18em] bg-neutral-900 text-white px-2 py-1 rounded-full">
+                <span className="text-[10px] font-bold uppercase tracking-[0.18em] bg-white text-black px-2.5 py-1 rounded-full">
                   Nuevo
                 </span>
               )}
               {isOffer && (
-                <span className="text-[9px] font-bold uppercase tracking-[0.18em] bg-neutral-900 text-white px-2 py-1 rounded-full ring-1 ring-white/15">
+                <span className="text-[10px] font-bold uppercase tracking-[0.18em] bg-amber-400 text-black px-2.5 py-1 rounded-full">
                   Oferta
                 </span>
               )}
@@ -61,28 +63,28 @@ export function ProductCard({ product, categorySlug = 'tienda' }: ProductCardPro
             {/* Top-right stock badge */}
             <div className="absolute top-3 right-3">
               {soldOut && (
-                <span className="text-[9px] font-bold uppercase tracking-[0.18em] bg-mpc-charcoal/90 backdrop-blur text-white px-2 py-1 rounded-full">
+                <span className="text-[10px] font-bold uppercase tracking-[0.18em] bg-black/85 backdrop-blur text-white/85 px-2.5 py-1 rounded-full ring-1 ring-white/10">
                   Agotado
                 </span>
               )}
               {stockLow && (
-                <span className="text-[9px] font-bold uppercase tracking-[0.18em] bg-white/80 backdrop-blur text-white px-2 py-1 rounded-full ring-1 ring-white/15">
-                  {product.stock} disp.
+                <span className="text-[10px] font-bold uppercase tracking-[0.18em] bg-black/85 backdrop-blur text-amber-300 px-2.5 py-1 rounded-full ring-1 ring-amber-300/20">
+                  Últimas {product.stock}
                 </span>
               )}
             </div>
           </div>
 
           {/* Body */}
-          <div className="px-5 pt-4 pb-5">
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-mpc-graphite mb-1.5">
+          <div className="px-5 pt-5 pb-5">
+            <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/55 mb-2">
               {product.brand}
             </div>
-            <h3 className="font-semibold text-[15px] leading-snug min-h-[2.5rem] line-clamp-2 group-hover:underline underline-offset-4 decoration-1">
+            <h3 className="font-semibold text-base md:text-[17px] leading-snug min-h-[2.75rem] line-clamp-2 group-hover:underline underline-offset-4 decoration-1 text-white">
               {product.name}
             </h3>
             {product.short_description && (
-              <p className="text-xs text-mpc-graphite line-clamp-2 mt-2 min-h-[2rem]">
+              <p className="text-sm text-white/55 line-clamp-2 mt-2.5 min-h-[2.25rem] leading-relaxed">
                 {product.short_description}
               </p>
             )}
@@ -100,7 +102,7 @@ export function ProductCard({ product, categorySlug = 'tienda' }: ProductCardPro
             </div>
           </div>
         </article>
-      </div>
+      </Spotlight>
     </Link>
   )
 }

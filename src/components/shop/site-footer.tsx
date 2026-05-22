@@ -6,7 +6,7 @@ const COLUMNS = [
   {
     title: 'Catálogo',
     links: [
-      { href: '/escritorios', label: 'Escritorios MPC' },
+      { href: '/escritorios', label: 'Escritorios JB' },
       { href: '/portatiles', label: 'Portátiles' },
       { href: '/monitores', label: 'Monitores' },
       { href: '/perifericos', label: 'Periféricos' },

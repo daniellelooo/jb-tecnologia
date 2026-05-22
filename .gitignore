@@ -44,3 +44,17 @@ supabase/.temp/
 
 # Test coverage
 coverage/
+
+# Screenshots de auditoría / debugging (locales, no commiteables)
+audit-*.png
+admin-*.png
+auth-*.png
+header-*.png
+final-*.png
+404-*.png
+cards-*.png
+configurador-*.png
+marquee-*.png
+real-imgs*.jpg
+real-imgs*.png
+*.playwright-trace.zip

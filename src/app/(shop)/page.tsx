@@ -1,8 +1,8 @@
 import Link from 'next/link'
-import Image from 'next/image'
-import { ArrowRight, Cpu, Shield, Wrench, Truck, MessageCircle } from 'lucide-react'
+import { ArrowRight, Shield, Wrench, Truck, MessageCircle } from 'lucide-react'
 import { getFeaturedProducts, getDealProducts } from '@/lib/queries/products'
 import { ProductCard } from '@/components/shop/product-card'
+import { HeroShowcase, type HeroSlide } from '@/components/shop/hero-showcase'
 import { getPrimaryImage, wixCdnUrl } from '@/lib/product-image'
 
 export const revalidate = 3600
@@ -14,13 +14,72 @@ const BUILD_LINES = [
   { tier: 'Ruby', range: 'Gaming', priceFrom: '$5.900.000', accent: 'from-red-900/40 to-stone-900' },
 ]
 
+// Logos vía Simple Icons CDN (https://simpleicons.org) — monocromos, ~2KB cada uno.
+// `slug` debe coincidir con simpleicons; `fallback: true` usa wordmark de texto si no hay logo.
+interface BrandLogoInfo {
+  name: string
+  slug: string
+  /** Algunos logos son más anchos (HP, Intel) — los hacemos un poco más grandes para balance óptico. */
+  scale?: number
+  /** Si el logo no existe en Simple Icons, usamos wordmark de texto */
+  fallback?: boolean
+}
+const BRAND_LOGOS: BrandLogoInfo[] = [
+  { name: 'Lenovo',    slug: 'lenovo',                scale: 1.15 },
+  { name: 'ASUS',      slug: 'asus' },
+  { name: 'HP',        slug: 'hp',                    scale: 1.2 },
+  { name: 'Acer',      slug: 'acer' },
+  { name: 'MSI',       slug: 'msi' },
+  { name: 'Redragon',  slug: 'redragon' },
+  { name: 'AMD',       slug: 'amd' },
+  { name: 'Intel',     slug: 'intel',                 scale: 1.15 },
+  { name: 'NVIDIA',    slug: 'nvidia' },
+  { name: 'Samsung',   slug: 'samsung',               scale: 1.1 },
+  { name: 'Kingston',  slug: 'kingstontechnology' },
+  { name: 'Logitech',  slug: '', fallback: true },
+]
+
+function BrandLogo({ brand }: { brand: BrandLogoInfo }) {
+  // Wordmark de texto cuando no hay logo en simpleicons
+  if (brand.fallback) {
+    return (
+      <span className="text-xl md:text-2xl font-bold tracking-tightest text-white/40 hover:text-white/70 whitespace-nowrap transition-colors duration-500 ease-premium select-none">
+        {brand.name}
+      </span>
+    )
+  }
+  const size = Math.round(36 * (brand.scale ?? 1))
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`https://cdn.simpleicons.org/${brand.slug}/ffffff`}
+      alt={brand.name}
+      width={size}
+      height={36}
+      loading="lazy"
+      decoding="async"
+      className="h-7 md:h-9 w-auto opacity-55 hover:opacity-100 transition-opacity duration-500 ease-premium select-none"
+      style={{ filter: 'grayscale(1)' }}
+    />
+  )
+}
+
 export default async function HomePage() {
   const [featured, deals] = await Promise.all([
     getFeaturedProducts(6),
     getDealProducts(4),
   ])
 
-  const heroImage = wixCdnUrl(getPrimaryImage(featured[0] ?? deals[0] ?? { product_images: [] } as never), 1400, 1400)
+  // Construye slides para el carousel del hero — mezcla featured + deals
+  const heroPool = [...featured, ...deals]
+    .filter((p, i, arr) => arr.findIndex((x) => x.id === p.id) === i)
+    .slice(0, 5)
+  const heroSlides: HeroSlide[] = heroPool
+    .map((p) => {
+      const src = wixCdnUrl(getPrimaryImage(p), 1400, 1400)
+      return src ? { src, name: p.name, tagline: p.stock > 0 ? 'Listo para enviar' : 'Próximamente' } : null
+    })
+    .filter((s): s is HeroSlide => s !== null)
 
   return (
     <>
@@ -62,53 +121,27 @@ export default async function HomePage() {
           </div>
 
           <div className="lg:col-span-5">
-            {/* Hero showcase card with double bezel */}
-            <div className="rounded-[2rem] p-2 bg-white/[0.04]">
-              <div className="rounded-[1.625rem] bg-mpc-fog overflow-hidden aspect-[5/6] relative">
-                {heroImage ? (
-                  <Image
-                    src={heroImage}
-                    alt="Producto destacado JB Tecnología"
-                    fill
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-contain p-12"
-                  />
-                ) : (
-                  <div className="absolute inset-0 grid place-items-center">
-                    <Cpu className="h-32 w-32 text-mpc-silver" strokeWidth={0.6} />
-                  </div>
-                )}
-                <div className="absolute top-5 left-5 flex flex-col gap-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] bg-neutral-900 text-white px-2.5 py-1 rounded-full">Destacado</span>
-                </div>
-                <div className="absolute bottom-5 left-5 right-5">
-                  <div className="rounded-2xl bg-black/85 backdrop-blur text-white p-4">
-                    <div className="text-[10px] uppercase tracking-[0.2em] text-white/50 mb-1">JB Builds</div>
-                    <div className="font-semibold text-base leading-tight">{featured[0]?.name ?? 'Configurador disponible'}</div>
-                    <div className="text-xs text-white/60 mt-1">{featured[0] ? 'Listo para enviar' : 'Arma tu propio build'}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Hero showcase con rotación automática */}
+            <HeroShowcase slides={heroSlides} intervalMs={5500} />
           </div>
         </div>
       </section>
 
-      {/* ========= TRUST STRIP — Marquee ========= */}
-      <section className="border-y border-white/[0.08] py-5 overflow-hidden">
-        <div className="flex gap-12 animate-marquee">
+      {/* ========= TRUST STRIP — Marquee de marcas ========= */}
+      <section className="border-y border-white/[0.08] py-8 overflow-hidden relative">
+        {/* Fade-out gradient on sides */}
+        <div aria-hidden className="absolute inset-y-0 left-0 w-24 z-10 bg-gradient-to-r from-[hsl(0_0%_3.5%)] to-transparent pointer-events-none" />
+        <div aria-hidden className="absolute inset-y-0 right-0 w-24 z-10 bg-gradient-to-l from-[hsl(0_0%_3.5%)] to-transparent pointer-events-none" />
+        <div className="flex gap-14 animate-marquee items-center">
           {[...Array(2)].flatMap((_, dup) =>
-            ['Lenovo', 'ASUS', 'HP', 'ACER', 'MSI', 'Redragon', 'AMD', 'Intel', 'NVIDIA', 'Samsung', 'Kingston', 'Logitech'].map((b) => (
-              <span key={`${b}-${dup}`} className="text-2xl font-bold tracking-tightest text-mpc-silver whitespace-nowrap">
-                {b}
-              </span>
+            BRAND_LOGOS.map((b) => (
+              <BrandLogo key={`${b.slug}-${dup}`} brand={b} />
             ))
           )}
         </div>
       </section>
 
-      {/* ========= MPC LINEUP — Bento ========= */}
+      {/* ========= JB LINEUP — Bento ========= */}
       <section className="container mx-auto px-4 py-24 lg:py-32">
         <div className="flex items-end justify-between flex-wrap gap-6 mb-12">
           <div>

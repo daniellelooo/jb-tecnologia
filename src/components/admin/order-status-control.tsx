@@ -45,12 +45,12 @@ export function OrderStatusControl({ orderId, currentStatus }: { orderId: string
   return (
     <div className="space-y-3">
       <div>
-        <label htmlFor="status" className="block text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400 mb-1.5">Cambiar estado</label>
+        <label htmlFor="status" className="block text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-500 mb-1.5">Cambiar estado</label>
         <select
           id="status"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="w-full h-10 rounded-xl border border-neutral-800 bg-neutral-900 px-3 text-sm font-medium focus:outline-none focus:border-white transition-colors duration-300 ease-premium"
+          className="w-full h-10 rounded-xl border border-neutral-200 bg-white text-neutral-900 px-3 text-sm font-medium focus:outline-none focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/5 transition-colors"
         >
           {STATUSES.map((s) => (
             <option key={s} value={s}>{STATUS_LABEL[s]}</option>
@@ -58,20 +58,20 @@ export function OrderStatusControl({ orderId, currentStatus }: { orderId: string
         </select>
       </div>
       <div>
-        <label htmlFor="note" className="block text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400 mb-1.5">Nota (opcional)</label>
+        <label htmlFor="note" className="block text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-500 mb-1.5">Nota (opcional)</label>
         <textarea
           id="note"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           rows={2}
           placeholder="Información para el cliente o el equipo"
-          className="w-full rounded-xl border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm placeholder:text-neutral-400 focus:outline-none focus:border-white transition-colors duration-300 ease-premium resize-none"
+          className="w-full rounded-xl border border-neutral-200 bg-white text-neutral-900 px-3 py-2 text-sm placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/5 transition-colors resize-none"
         />
       </div>
       <button
         onClick={handleUpdate}
         disabled={pending}
-        className="group w-full inline-flex items-center justify-center gap-2 bg-neutral-900 text-white rounded-full py-2.5 text-sm font-medium hover:bg-white/95 hover:text-black transition-all duration-500 ease-premium active:scale-[0.98] disabled:opacity-50"
+        className="group w-full inline-flex items-center justify-center gap-2 bg-neutral-900 text-white rounded-full py-2.5 text-sm font-medium hover:bg-neutral-800 transition-colors duration-300 disabled:opacity-50"
       >
         {pending ? <><Loader2 className="h-4 w-4 animate-spin" /> Guardando…</> : <><Check className="h-4 w-4" strokeWidth={1.8} /> Actualizar estado</>}
       </button>

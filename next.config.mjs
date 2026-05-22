@@ -6,6 +6,8 @@ const nextConfig = {
       { protocol: 'https', hostname: '*.supabase.co', pathname: '/storage/v1/object/public/**' },
       { protocol: 'https', hostname: 'static.wixstatic.com', pathname: '/**' },
       { protocol: 'https', hostname: 'masterspc.com.co', pathname: '/**' },
+      { protocol: 'https', hostname: 'commons.wikimedia.org', pathname: '/**' },
+      { protocol: 'https', hostname: 'upload.wikimedia.org', pathname: '/**' },
     ],
   },
 }

@@ -2,14 +2,14 @@ import { ShieldCheck, Wrench, Clock, FileText, AlertCircle, MessageCircle } from
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Garantía MPC',
+  title: 'Garantía JB Tecnología',
   description: 'Conoce las políticas de garantía de JB Tecnología MED para PCs ensambladas, componentes y periféricos.',
 }
 
 const COVERAGE = [
   { period: '6 meses', label: 'Mano de obra', desc: 'Cubrimos cualquier defecto de ensamble o instalación realizada en nuestra sede.' },
   { period: '1 año', label: 'Componentes individuales', desc: 'Cada componente conserva su garantía oficial de fábrica respaldada por JB Tecnología MED.' },
-  { period: '2 años', label: 'PCs MPC ensambladas', desc: 'Garantía extendida exclusiva en todas nuestras líneas Bronze, Silver, Gold y superiores.' },
+  { period: '2 años', label: 'PCs JB ensambladas', desc: 'Garantía extendida exclusiva en todas nuestras líneas Bronze, Silver, Gold y superiores.' },
   { period: 'Diagnóstico gratis', label: 'Servicio técnico', desc: 'Trae tu equipo a nuestra sede del Centro Comercial Monterrey sin costo de revisión.' },
 ]
 

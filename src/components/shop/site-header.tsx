@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { Menu, X, Search } from 'lucide-react'
 import { Logo } from './logo'
 import { CartTrigger } from './cart-trigger'
+import { AuthTrigger } from './auth-trigger'
 import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
@@ -53,8 +54,8 @@ export function SiteHeader() {
               'flex items-center justify-between gap-4 transition-all duration-500 ease-premium',
               'rounded-full backdrop-blur-xl',
               scrolled
-                ? 'bg-white/80 border border-white/[0.06] shadow-soft px-3 py-2'
-                : 'bg-white/40 border border-transparent px-4 py-3'
+                ? 'bg-neutral-950/90 border border-white/[0.08] shadow-soft px-3 py-2'
+                : 'bg-neutral-950/40 border border-transparent px-4 py-3'
             )}
           >
             <Link href="/" className="shrink-0">
@@ -87,6 +88,8 @@ export function SiteHeader() {
               >
                 <Search className="h-4 w-4" strokeWidth={1.5} />
               </Link>
+
+              <AuthTrigger />
 
               <CartTrigger />
 

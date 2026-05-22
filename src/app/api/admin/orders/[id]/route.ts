@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/admin-auth'
+import { sendOrderStatusEmail } from '@/lib/email'
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { error: authError, user } = await requireAdmin()
@@ -12,7 +13,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const supabase = createAdminClient()
 
   // Verify order exists
-  const { data: order } = await supabase.from('orders').select('id, status').eq('id', id).maybeSingle()
+  const { data: order } = await supabase.from('orders').select('id, status, order_number, customer_name, customer_email').eq('id', id).maybeSingle()
   if (!order) return NextResponse.json({ error: 'Pedido no encontrado' }, { status: 404 })
 
   // Update order status if changed
@@ -28,6 +29,17 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     note: note || null,
     changed_by: user?.email ?? 'admin',
   })
+
+  // Enviar correo de estado al cliente si tiene email
+  if (status && status !== order.status && order.customer_email) {
+    sendOrderStatusEmail({
+      orderNumber: order.order_number,
+      customerName: order.customer_name,
+      customerEmail: order.customer_email,
+      status,
+      notes: note || undefined,
+    }).catch((e) => console.error('[email] Error enviando estado:', e))
+  }
 
   return NextResponse.json({ ok: true })
 }

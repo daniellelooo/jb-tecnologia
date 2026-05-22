@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const CATEGORY_TAGLINES: Record<string, string> = {
-  escritorios: 'Equipos de escritorio MPC ensamblados con componentes de alto rendimiento.',
+  escritorios: 'Equipos de escritorio JB ensamblados a mano en Medellín con componentes de alto rendimiento.',
   portatiles: 'Laptops gaming y workstation para movilidad sin compromisos.',
   monitores: 'Pantallas profesionales con tasa de refresco y color calibrado.',
   perifericos: 'Teclados mecánicos, mice gaming, headsets y accesorios premium.',

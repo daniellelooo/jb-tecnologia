@@ -13,5 +13,11 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
 
   if (!user) redirect('/admin/login')
 
+  const role = user.user_metadata?.role
+  if (role !== 'admin') {
+    await supabase.auth.signOut()
+    redirect('/admin/login?error=no-permission')
+  }
+
   return <AdminShell>{children}</AdminShell>
 }

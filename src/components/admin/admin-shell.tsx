@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { LayoutDashboard, Package, ShoppingBag, Hammer, LogOut, ExternalLink, Menu, X, ShoppingCart, Users } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingBag, Hammer, LogOut, ExternalLink, Menu, X, BarChart3, Users, Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -11,11 +11,12 @@ import { Logo } from '@/components/shop/logo'
 
 const NAV = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { href: '/admin/ventas', label: 'Punto de Venta', icon: ShoppingCart },
-  { href: '/admin/vendedores', label: 'Vendedores', icon: Users },
-  { href: '/admin/productos', label: 'Productos', icon: Package, badgeKey: 'lowStock' as const },
+  { href: '/admin/reportes', label: 'Reportes', icon: BarChart3 },
   { href: '/admin/pedidos', label: 'Pedidos', icon: ShoppingBag, badgeKey: 'pending' as const },
+  { href: '/admin/productos', label: 'Productos', icon: Package, badgeKey: 'lowStock' as const },
   { href: '/admin/builds', label: 'Builds', icon: Hammer, badgeKey: 'buildRequests' as const },
+  { href: '/admin/clientes', label: 'Clientes', icon: Users },
+  { href: '/admin/configuracion', label: 'Configuración', icon: Settings },
 ]
 
 export function AdminShell({ children }: { children: React.ReactNode }) {

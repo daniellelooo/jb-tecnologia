@@ -1,4 +1,4 @@
-import type { Product, BuildSlots, CompatibilityIssue, CpuSpecs, MotherboardSpecs, RamSpecs, GpuSpecs, PsuSpecs, CaseSpecs, CoolingSpecs } from '@/types'
+import type { Product, BuildSlots, CompatibilityIssue, CpuSpecs, MotherboardSpecs, RamSpecs, GpuSpecs, PsuSpecs, CaseSpecs, CoolingSpecs, StorageSpecs } from '@/types'
 
 function specs<T>(product: Product | null): T | null {
   if (!product) return null
@@ -6,6 +6,35 @@ function specs<T>(product: Product | null): T | null {
 }
 
 const BASE_SYSTEM_TDP = 80 // CPU + GPU don't account for everything
+
+// Score relativo de CPU multi-thread (0-100). Calibrado contra Cinebench R23.
+// Mantenemos esta tabla aparte de performance.ts para no acoplar módulos.
+const CPU_MT_BY_NAME: Array<[RegExp, number]> = [
+  [/i3[- ]?12100/i, 45],
+  [/i5[- ]?12400/i, 60],
+  [/i5[- ]?13600/i, 85],
+  [/i7[- ]?14700/i, 95],
+  [/ryzen ?5 ?5600/i, 58],
+  [/ryzen ?5 ?7600/i, 72],
+  [/ryzen ?7 ?7700/i, 88],
+  [/ryzen ?9 ?7900/i, 100],
+]
+
+// Score relativo de GPU (0-120). Misma escala que performance.ts.
+const GPU_POWER_BY_NAME: Array<[RegExp, number]> = [
+  [/gtx ?1650/i, 30],
+  [/rx ?7600/i, 70],
+  [/rtx ?3060(?! ?ti)/i, 72],
+  [/rtx ?4060(?! ?ti)/i, 80],
+  [/(rx ?6700 ?xt|6700xt)/i, 85],
+  [/rtx ?3070 ?ti/i, 105],
+  [/rtx ?4070(?! ?ti| ?super)/i, 120],
+]
+
+function scoreFromName(name: string, table: Array<[RegExp, number]>, fallback: number): number {
+  for (const [pat, val] of table) if (pat.test(name)) return val
+  return fallback
+}
 
 export function checkCompatibility(build: BuildSlots): CompatibilityIssue[] {
   const issues: CompatibilityIssue[] = []
@@ -17,6 +46,7 @@ export function checkCompatibility(build: BuildSlots): CompatibilityIssue[] {
   const psu = specs<PsuSpecs>(build.psu)
   const caseSpecs = specs<CaseSpecs>(build.case)
   const cooling = specs<CoolingSpecs>(build.cooling)
+  const storage = specs<StorageSpecs>(build.storage)
 
   // REGLA 1: CPU socket ↔ Motherboard socket
   if (cpu && mobo && cpu.socket !== mobo.socket) {
@@ -105,6 +135,62 @@ export function checkCompatibility(build: BuildSlots): CompatibilityIssue[] {
         severity: 'error',
         slot: 'cooling',
         message: `Esta refrigeración no es compatible con el socket ${cpu.socket} de tu procesador.`,
+      })
+    }
+  }
+
+  // REGLA 7: Bottleneck CPU ↔ GPU
+  //   El score multi-thread del CPU debe ser >= ~65% del power score de la GPU
+  //   para evitar que la GPU quede ociosa en cargas mixtas (gaming, AAA, streaming).
+  if (build.cpu && build.gpu) {
+    const cpuMt = scoreFromName(build.cpu.name, CPU_MT_BY_NAME, Math.min(100, 30 + (cpu?.cores ?? 4) * 6))
+    const gpuPower = scoreFromName(build.gpu.name, GPU_POWER_BY_NAME, 60)
+    const cpuNeeded = Math.min(95, 30 + gpuPower * 0.55)
+    if (cpuMt < cpuNeeded * 0.75) {
+      const lossPct = Math.round((1 - cpuMt / cpuNeeded) * 60)
+      issues.push({
+        severity: 'warning',
+        slot: 'cpu',
+        message: `Tu CPU se queda corto frente a la ${build.gpu.name}: en juegos AAA y multitarea pesada vas a perder ~${lossPct}% de los FPS posibles. Considera un CPU más potente o una GPU acorde.`,
+      })
+    } else if (cpuMt < cpuNeeded) {
+      issues.push({
+        severity: 'warning',
+        slot: 'cpu',
+        message: `Combinación funcional, pero la ${build.gpu.name} pide un poco más de CPU para rendir al 100% en títulos exigentes.`,
+      })
+    }
+  }
+
+  // REGLA 8: RAM single-stick (1 sola memoria = single channel, hasta -40% en juegos)
+  if (ram) {
+    const sticks = ram.kit_pieces ?? 2
+    if (sticks < 2) {
+      issues.push({
+        severity: 'warning',
+        slot: 'ram',
+        message: `Una sola memoria RAM corre en single-channel y puede reducir hasta 30-40% el rendimiento en juegos y aplicaciones intensivas. Recomendamos un kit de 2 módulos.`,
+      })
+    }
+  }
+
+  // REGLA 9: Sin SSD/NVMe (solo HDD = arranque y carga lentísimos)
+  if (storage && storage.type === 'HDD') {
+    issues.push({
+      severity: 'warning',
+      slot: 'storage',
+      message: `Solo elegiste un HDD mecánico. Para una experiencia moderna se recomienda mínimo un SSD/NVMe como disco principal (Windows arranca en segundos vs. minutos).`,
+    })
+  }
+
+  // REGLA 10: RAM muy poca para una GPU potente
+  if (ram && build.gpu) {
+    const gpuPower = scoreFromName(build.gpu.name, GPU_POWER_BY_NAME, 60)
+    if (gpuPower >= 80 && ram.capacity_gb < 16) {
+      issues.push({
+        severity: 'warning',
+        slot: 'ram',
+        message: `Con una GPU de este nivel, 16GB de RAM es el mínimo recomendado. Vas a notar limitaciones en juegos modernos y multitarea.`,
       })
     }
   }
