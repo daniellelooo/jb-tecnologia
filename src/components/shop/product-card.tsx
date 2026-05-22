@@ -35,7 +35,7 @@ export function ProductCard({ product, categorySlug = 'tienda' }: ProductCardPro
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
                 className="object-contain p-6 transition-transform duration-700 ease-premium group-hover:scale-[1.04]"
-                unoptimized={primaryImage.includes('wikimedia.org')}
+                unoptimized={primaryImage.startsWith('http')}
               />
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-mpc-fog via-mpc-mist to-mpc-fog">

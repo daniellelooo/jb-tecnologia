@@ -60,7 +60,7 @@ export function HeroShowcase({ slides, intervalMs = 5000 }: HeroShowcaseProps) {
                   priority={i === 0}
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-contain p-12"
-                  unoptimized={slide.src.includes('wikimedia.org')}
+                  unoptimized={slide.src.startsWith('http')}
                 />
               )}
             </div>

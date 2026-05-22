@@ -85,7 +85,7 @@ export default async function ProductPage({ params }: PageProps) {
                   priority
                   sizes="(max-width: 1024px) 100vw, 600px"
                   className="object-contain p-10"
-                  unoptimized={heroUrl.includes('wikimedia.org')}
+                  unoptimized={heroUrl?.startsWith('http')}
                 />
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-mpc-fog via-mpc-mist to-mpc-fog">
