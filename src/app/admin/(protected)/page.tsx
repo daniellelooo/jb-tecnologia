@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { format, startOfDay, startOfMonth } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { ShoppingBag, DollarSign, Hammer, AlertTriangle, Clock, Package, ArrowRight } from 'lucide-react'
+import { ShoppingBag, DollarSign, Hammer, AlertTriangle, Clock, Package, ArrowRight, TrendingUp } from 'lucide-react'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { formatCOP } from '@/types'
 import { SalesReportExport } from '@/components/admin/sales-report-export'
@@ -19,18 +19,26 @@ async function getDashboardData() {
     { data: pendingBuilds },
     { data: lowStock, count: lowStockCount },
     { data: monthOrders },
+    { data: todaySellers },
   ] = await Promise.all([
     supabase.from('orders').select('total', { count: 'exact' }).gte('created_at', todayStart),
     supabase.from('orders').select('id, order_number, customer_name, total, created_at').eq('status', 'pendiente').order('created_at', { ascending: false }).limit(5),
     supabase.from('pc_builds').select('id, customer_name, customer_phone, total_price, created_at').eq('status', 'requested').order('created_at', { ascending: false }).limit(5),
     supabase.from('products').select('id, name, stock, brand', { count: 'exact' }).lt('stock', 5).eq('is_active', true).order('stock'),
     supabase.from('orders').select('total').gte('created_at', monthStart).neq('status', 'cancelado'),
+    supabase.from('orders').select('total, seller_id, sellers(commission_rate)').gte('created_at', todayStart).neq('status', 'cancelado').not('seller_id', 'is', null),
   ])
+
+  const comisionesHoy = (todaySellers ?? []).reduce((sum, o) => {
+    const rate = Number((o.sellers as { commission_rate: number } | null)?.commission_rate ?? 0)
+    return sum + Number(o.total) * (rate / 100)
+  }, 0)
 
   return {
     ordersTodayCount: ordersTodayCount ?? 0,
     revenueToday: (ordersToday ?? []).reduce((sum, o) => sum + Number(o.total), 0),
     revenueMonth: (monthOrders ?? []).reduce((sum, o) => sum + Number(o.total), 0),
+    comisionesHoy,
     pendingOrdersCount: pendingOrders?.length ?? 0,
     pendingBuildsCount: pendingBuilds?.length ?? 0,
     lowStockCount: lowStockCount ?? 0,
@@ -51,11 +59,12 @@ export default async function AdminDashboard() {
       </header>
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <Kpi title="Pedidos hoy" value={data.ordersTodayCount.toString()} sub={formatCOP(data.revenueToday)} icon={ShoppingBag} />
         <Kpi title="Pendientes" value={data.pendingOrdersCount.toString()} sub="Por confirmar" icon={Clock} href="/admin/pedidos?status=pendiente" />
         <Kpi title="Builds nuevos" value={data.pendingBuildsCount.toString()} sub="Solicitudes activas" icon={Hammer} href="/admin/builds" />
         <Kpi title="Stock bajo" value={data.lowStockCount.toString()} sub="Productos < 5" icon={AlertTriangle} href="/admin/productos?filter=bajo" />
+        <Kpi title="Comisiones hoy" value={formatCOP(data.comisionesHoy)} sub="Vendedores activos" icon={TrendingUp} href="/admin/vendedores" />
       </div>
 
       <SalesReportExport />
