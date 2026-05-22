@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendAdminNewOrderEmail, sendCustomerConfirmationEmail } from '@/lib/email'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -67,6 +68,45 @@ export async function POST(req: Request) {
     }
 
     const payload = result as { id: string; order_number: string }
+
+    // Enviar correos en background (no bloquea la respuesta al cliente)
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3001'
+    Promise.all([
+      sendAdminNewOrderEmail({
+        orderNumber: payload.order_number,
+        customerName: data.customer_name,
+        customerPhone: data.customer_phone,
+        customerEmail: data.customer_email || null,
+        deliveryType: data.delivery_type,
+        deliveryAddress: data.delivery_address || null,
+        paymentMethod: data.payment_method,
+        total: data.total,
+        items: data.items.map((i) => ({
+          product_name: `Producto (${i.product_id.slice(0, 8)})`,
+          quantity: i.quantity,
+          unit_price: i.unit_price,
+          total_price: i.unit_price * i.quantity,
+        })),
+        notes: data.notes || null,
+        adminUrl: `${siteUrl}/admin/pedidos/${payload.id}`,
+      }),
+      data.customer_email
+        ? sendCustomerConfirmationEmail({
+            orderNumber: payload.order_number,
+            customerName: data.customer_name,
+            customerEmail: data.customer_email,
+            deliveryType: data.delivery_type,
+            paymentMethod: data.payment_method,
+            total: data.total,
+            items: data.items.map((i) => ({
+              product_name: `Producto (${i.product_id.slice(0, 8)})`,
+              quantity: i.quantity,
+              total_price: i.unit_price * i.quantity,
+            })),
+          })
+        : Promise.resolve(),
+    ]).catch((e) => console.error('[email] Error enviando correos:', e))
+
     return NextResponse.json(payload, { status: 201 })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Error desconocido'
